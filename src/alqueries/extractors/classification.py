@@ -65,11 +65,12 @@ class ClassificationFeatureExtractor(FeatureExtractor):
 
         logits = torch.cat(logits_chunks, dim=0)
         mc_logits = self.extract_mc(loader)
+        print(logits.shape, mc_logits.shape, mc_logits.mean(dim=0).shape, F.softmax(mc_logits, dim=2))
         out: dict[str, np.ndarray | torch.Tensor] = {
             "logits": logits,
-            "mc_logits": mc_logits,
+            "mc_logits": mc_logits.mean(dim=0),
             "probs": F.softmax(logits, dim=1),
-            "mc_probs": F.softmax(mc_logits, dim=2),
+            "mc_probs": F.softmax(mc_logits, dim=2).mean(dim=0),
         }
         if embeddings_chunks:
             out["embeddings"] = torch.cat(embeddings_chunks, dim=0).numpy()
@@ -92,4 +93,4 @@ class ClassificationFeatureExtractor(FeatureExtractor):
                 runs.append(F.softmax(torch.cat(logits_chunks, dim=0), dim=1))
         stacked = torch.stack(runs, dim=0)
         self._model.eval()  # restore eval mode
-        return stacked.mean(0) if reduce == "mean" else stacked
+        return stacked

@@ -29,7 +29,7 @@ def test_extract_returns_logits_probs_and_embeddings():
 
     out = extractor.extract(loader)
 
-    assert set(out.keys()) == {"logits", "probs", "embeddings"}
+    assert set(out.keys()) == {"logits", "probs", "embeddings", "mc_logits", "mc_probs"}
     assert out["logits"].shape == (n_pool, n_classes)
     assert out["probs"].shape == (n_pool, n_classes)
     assert out["embeddings"].shape == (n_pool, 16)
